@@ -1,11 +1,11 @@
 <template>
   <div>
-    Countries List
+    Navbar
   </div>
 </template>
 
 <script>
 export default {
-  name: 'CountriesListComponent',
+  name: 'NavbarComponent',
 };
 </script>
