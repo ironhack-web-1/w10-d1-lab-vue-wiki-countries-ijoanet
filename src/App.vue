@@ -1,65 +1,57 @@
 <template>
-  <div className="app">
-    <header className="app-header">
-      <p>
-        Edit <code>src/main.js</code> and save to reload.
-      </p>
-    </header>
+  <div class="app">
+    <Navbar />
+
+    <div class="d-flex justify-content-center">
+      <Spinner v-if="loading" />
+      <div v-else className="container">
+        <div className="row">
+          <CountriesList :countries="countries" />
+          <router-view />
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
-<style>
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
+<script>
+import Navbar from './components/NavbarComponent.vue';
+import CountriesList from './components/CountriesListComponent.vue';
+import Spinner from './components/SpinnerComponent.vue';
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
-}
+export default {
+  name: 'App',
+  components: {
+    Navbar,
+    CountriesList,
+    Spinner,
+  },
+  data() {
+    return {
+      countries: [],
+      loading: true,
+    };
+  },
+  mounted() {
+    this.fetchCountries();
+  },
+  methods: {
+    async fetchCountries() {
+      const { data } = await this.axios.get('https://ih-countries-api.herokuapp.com/countries');
 
-.app {
-  text-align: center;
-}
-
-.app-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .app-logo {
-    animation: app-logo-spin infinite 20s linear;
-  }
-}
-
-.app-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
-}
-
-.app-link {
-  color: #61dafb;
-}
-
-@keyframes app-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-</style>
+      const countries = [];
+      data.forEach((country) => {
+        const newCountry = {
+          name: country.name.official,
+          alphaCode: country.alpha3Code,
+          flagImg: `https://flagpedia.net/data/flags/icon/72x54/${country.alpha2Code.toLowerCase()}.png`,
+        };
+        countries.push(newCountry);
+      });
+      // just asign all data at once to avoid unneeded reactivity
+      this.countries = countries;
+      this.loading = false;
+    },
+  },
+};
+</script>
